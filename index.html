@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SMS Test Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #101114;
+      color: #eee;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 11px;
+      border-radius: 7px;
+      border: 1px solid #444;
+      background: #181a20;
+      color: white;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #181a20;
+      border: 1px solid #292c34;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .sender {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .message {
+      margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .meta {
+      color: #999;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .error {
+      color: #ff7777;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>SMS Test Dashboard</h1>
+
+  <div class="toolbar">
+    <input
+      id="token"
+      type="password"
+      placeholder="Admin token"
+      autocomplete="off"
+    >
+
+    <button onclick="loadMessages()">
+      Refresh
+    </button>
+  </div>
+
+  <div id="status"></div>
+  <div id="messages"></div>
+
+</div>
+
+<script>
+const API = "https://smssend-8ek4.onrender.com";
+
+async function loadMessages() {
+  const token = document.getElementById("token").value;
+  const status = document.getElementById("status");
+  const container = document.getElementById("messages");
+
+  status.textContent = "Loading...";
+  container.innerHTML = "";
+
+  try {
+    const response = await fetch(
+      `${API}/api/messages?limit=100`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Request failed");
+    }
+
+    status.textContent = `${data.length} messages`;
+
+    for (const item of data) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const sender = document.createElement("div");
+      sender.className = "sender";
+      sender.textContent = item.sender;
+
+      const message = document.createElement("div");
+      message.className = "message";
+      message.textContent = item.message;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent =
+        `${item.deviceId} • ${new Date(item.createdAt).toLocaleString()}`;
+
+      card.appendChild(sender);
+      card.appendChild(message);
+      card.appendChild(meta);
+
+      container.appendChild(card);
+    }
+  } catch (err) {
+    status.className = "error";
+    status.textContent = err.message;
+  }
+}
+</script>
+
+</body>
+</html>
