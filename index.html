@@ -1,39 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SMS Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  /* =========================================================
+     THEME TOKENS
+  ========================================================== */
 
   :root {
-    --bg: #060812;
-    --bg-2: #0a0e1c;
-    --panel: rgba(255,255,255,0.045);
-    --panel-solid: #0d1120;
-    --border: rgba(255,255,255,0.09);
-    --border-soft: rgba(255,255,255,0.06);
-    --text: #eef1f8;
-    --muted: #8890a6;
-    --muted-dim: #5c6478;
-
-    --violet: #a78bfa;
-    --cyan: #67e8f9;
-    --pink: #f472b6;
-    --green: #4ade80;
-    --red: #fb7185;
-    --amber: #fbbf6d;
-
-    --radius: 18px;
-    --radius-sm: 12px;
-    --font-display: "Poppins", "Segoe UI", sans-serif;
+    --font-display: "Manrope", "Segoe UI", sans-serif;
     --font-body: "Inter", "Segoe UI", sans-serif;
+
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --sidebar-w: 224px;
+
+    --accent: #4f5fd6;
+    --accent-strong: #3d4ac2;
+    --accent-soft: #eef0fd;
+
+    --success: #16a34a;
+    --success-soft: #e9f8ef;
+    --danger: #dc2626;
+    --danger-soft: #fdecec;
+    --warning: #d97706;
+    --warning-soft: #fdf3e3;
+    --info: #0891b2;
+    --info-soft: #e6f7fa;
   }
 
-  html, body {
-    height: 100%;
+  html[data-theme="light"] {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --surface-2: #fafbfd;
+    --border: #e6e8f0;
+    --border-strong: #d8dbe6;
+    --text: #171a24;
+    --text-muted: #6b7080;
+    --text-faint: #9aa0b1;
+    --shadow: 0 1px 2px rgba(20,22,40,0.04), 0 8px 24px -8px rgba(20,22,40,0.08);
+    --shadow-sm: 0 1px 2px rgba(20,22,40,0.05);
+    --scrollbar: #d8dbe6;
+  }
+
+  html[data-theme="dark"] {
+    --bg: #0e0f14;
+    --surface: #16181f;
+    --surface-2: #1c1e27;
+    --border: #272a35;
+    --border-strong: #34384a;
+    --text: #eef0f6;
+    --text-muted: #9499ac;
+    --text-faint: #6a7086;
+    --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 12px 28px -10px rgba(0,0,0,0.55);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --scrollbar: #2b2e3a;
+    --accent-soft: #1c2044;
+    --success-soft: #0f2419;
+    --danger-soft: #2a1517;
+    --warning-soft: #2a1f0e;
+    --info-soft: #0d2429;
   }
 
   body {
@@ -42,365 +78,401 @@
     color: var(--text);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    transition: background .2s ease, color .2s ease;
   }
 
-  button, input, select { font: inherit; }
+  button, input, select { font: inherit; color: inherit; }
   button { cursor: pointer; }
   input, select { -webkit-appearance: none; appearance: none; }
+  a { color: inherit; }
 
-  ::selection { background: rgba(167,139,250,0.35); color: #fff; }
-
+  ::selection { background: var(--accent-soft); }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 99px; }
 
-  /* ---------------- BACKGROUND ATMOSPHERE ---------------- */
-
-  .sky {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 90% 60% at 20% -10%, rgba(167,139,250,0.16), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 100% 0%, rgba(103,232,249,0.10), transparent 60%),
-      radial-gradient(ellipse 80% 60% at 50% 120%, rgba(244,114,182,0.08), transparent 60%),
-      linear-gradient(180deg, var(--bg-2), var(--bg) 40%);
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
-  .star {
-    position: absolute;
-    background: #fff;
-    border-radius: 50%;
-    opacity: 0.2;
-    animation: twinkle ease-in-out infinite;
-  }
+  /* =========================================================
+     SHELL LAYOUT — SIDEBAR + MAIN
+  ========================================================== */
 
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.15; transform: scale(0.8); }
-    50% { opacity: 0.95; transform: scale(1.15); }
-  }
-
-  .shooting-star {
-    position: absolute;
-    top: 8%;
-    left: 8%;
-    width: 2px;
-    height: 2px;
-    background: linear-gradient(90deg, #fff, transparent);
-    border-radius: 50%;
-    filter: drop-shadow(0 0 6px #fff);
-    animation: shoot 7s ease-in infinite;
-    animation-delay: 2.5s;
-  }
-
-  @keyframes shoot {
-    0% { transform: translate(0,0) scaleX(1); opacity: 0; }
-    2% { opacity: 1; }
-    18% { transform: translate(340px, 170px) scaleX(1); opacity: 0; }
-    100% { opacity: 0; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .star, .shooting-star { animation: none; }
-  }
-
-  /* ---------------- LAYOUT ---------------- */
-
-  .app {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: auto;
-    padding: 28px 22px 60px;
-  }
-
-  /* ---------------- HEADER ---------------- */
-
-  .header {
+  .shell {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 26px;
-    flex-wrap: wrap;
+    min-height: 100vh;
   }
 
-  .brand { display: flex; align-items: center; gap: 14px; }
+  /* ---------------- SIDEBAR ---------------- */
+
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px 22px;
+  }
 
   .brand-mark {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
-    background: linear-gradient(145deg, rgba(167,139,250,0.25), rgba(103,232,249,0.15));
-    border: 1px solid var(--border);
-    box-shadow: 0 0 22px rgba(167,139,250,0.25);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
     flex-shrink: 0;
   }
 
-  .brand h1 {
-    margin: 0;
+  .brand-name {
     font-family: var(--font-display);
-    font-size: 21px;
-    font-weight: 600;
-    letter-spacing: -0.2px;
+    font-weight: 700;
+    font-size: 14.5px;
+    line-height: 1.2;
   }
 
-  .brand p {
-    margin: 2px 0 0;
-    color: var(--muted);
-    font-size: 12.5px;
+  .brand-sub {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 1px;
   }
 
-  .api-status {
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .nav-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 14px 10px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+  }
+
+  .nav-item .ic {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-item:hover { background: var(--surface-2); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .nav-item .count {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-faint);
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 1px 7px;
+  }
+
+  .nav-item.active .count { background: rgba(79,95,214,0.14); color: var(--accent); }
+
+  .sidebar-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* theme switch */
+
+  .theme-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+
+  .theme-switch span { font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+
+  .switch {
+    position: relative;
+    width: 38px;
+    height: 21px;
+    border-radius: 999px;
+    background: var(--border-strong);
+    border: 0;
+    flex-shrink: 0;
+    transition: background .2s ease;
+  }
+
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: transform .2s ease;
+  }
+
+  html[data-theme="dark"] .switch { background: var(--accent); }
+  html[data-theme="dark"] .switch::after { transform: translateX(17px); }
+
+  .logout-link {
     display: flex;
     align-items: center;
     gap: 9px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--border);
-    background: var(--panel);
-    backdrop-filter: blur(14px);
-    border-radius: 999px;
-    padding: 9px 15px;
-    font-size: 12.5px;
-    white-space: nowrap;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
   }
 
-  .dot {
+  .logout-link:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ---------------- MAIN ---------------- */
+
+  .main {
+    flex: 1;
+    min-width: 0;
+    padding: 26px 32px 60px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+  }
+
+  .page-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 7px 13px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .live-dot {
+    position: relative;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--muted-dim);
+    background: var(--text-faint);
+    flex-shrink: 0;
   }
 
-  .dot.online {
-    background: var(--green);
-    box-shadow: 0 0 12px rgba(74,222,128,.7);
-    animation: pulse-dot 2s ease-in-out infinite;
+  .live-dot.online { background: var(--success); }
+  .live-dot.offline { background: var(--danger); }
+
+  .live-dot.online::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1.5px solid var(--success);
+    animation: ring 1.8s ease-out infinite;
   }
 
-  .dot.offline { background: var(--red); box-shadow: 0 0 10px rgba(251,113,133,.6); }
-
-  @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 6px rgba(74,222,128,.5); }
-    50% { box-shadow: 0 0 14px rgba(74,222,128,.9); }
+  @keyframes ring {
+    0% { transform: scale(0.6); opacity: .8; }
+    100% { transform: scale(1.8); opacity: 0; }
   }
 
-  /* ---------------- LOGIN ---------------- */
-
-  .login {
-    position: relative;
-    z-index: 1;
-    max-width: 400px;
-    margin: 10vh auto;
-    padding: 34px 28px;
-    border: 1px solid var(--border);
-    background: var(--panel);
-    backdrop-filter: blur(20px);
-    border-radius: 22px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot.online::after { animation: none; }
   }
 
-  .login-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    background: linear-gradient(145deg, rgba(167,139,250,0.3), rgba(244,114,182,0.2));
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 0 26px rgba(167,139,250,0.3);
-  }
-
-  .login h2 {
-    margin: 0 0 6px;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 20px;
-    background: linear-gradient(120deg, #fff, var(--violet) 80%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .login p {
-    color: var(--muted);
-    line-height: 1.55;
-    font-size: 13.5px;
-    margin: 0 0 22px;
-  }
-
-  .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
-
-  .field label {
-    font-size: 12px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .5px;
-  }
-
-  input, select {
-    width: 100%;
-    padding: 12px 14px;
-    color: var(--text);
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    outline: none;
-    transition: border-color .15s ease, box-shadow .15s ease;
-  }
-
-  input:focus, select:focus {
-    border-color: rgba(167,139,250,0.6);
-    box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
-  }
-
-  select { cursor: pointer; }
-
-  .primary {
-    width: 100%;
-    border: 0;
-    border-radius: var(--radius-sm);
-    padding: 13px 16px;
-    background: linear-gradient(120deg, var(--violet), var(--pink));
-    color: #12081f;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: .2px;
-    box-shadow: 0 8px 26px rgba(167,139,250,0.28);
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-
-  .primary:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(167,139,250,0.4); }
-  .primary:active { transform: translateY(0); }
-
-  .login-error {
-    margin-top: 13px;
-    color: var(--red);
-    font-size: 12.5px;
-    min-height: 16px;
-  }
-
-  /* ---------------- DASHBOARD ---------------- */
-
-  #dashboard { display: none; }
+  /* toolbar row */
 
   .toolbar {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
   }
 
-  .toolbar .search { flex: 1; min-width: 220px; }
+  .toolbar .search-wrap { position: relative; flex: 1; min-width: 220px; }
 
-  .ghost-btn {
-    padding: 11px 16px;
+  .toolbar .search-wrap .ic {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 14px 10px 34px;
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--panel);
-    backdrop-filter: blur(10px);
+    background: var(--surface);
+    border-radius: var(--radius-md);
     color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    transition: background .15s ease, border-color .15s ease;
   }
 
-  .ghost-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+  .search-input::placeholder { color: var(--text-faint); }
 
-  /* ---------------- STATS ---------------- */
+  .select-input, .btn {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: var(--surface-2); border-color: var(--border-strong); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-strong); }
+
+  /* =========================================================
+     STAT CARDS
+  ========================================================== */
 
   .stats {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
     margin-bottom: 28px;
   }
 
-  .stat {
-    position: relative;
-    overflow: hidden;
+  .stat-card {
+    background: var(--surface);
     border: 1px solid var(--border);
-    background: var(--panel);
-    backdrop-filter: blur(14px);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     padding: 18px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
   }
 
-  .stat::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent, linear-gradient(90deg, var(--violet), var(--cyan)));
+  .stat-card .stat-icon {
+    width: 34px; height: 34px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
 
-  .stat.c-violet::before { background: linear-gradient(90deg, var(--violet), #7c5cf0); }
-  .stat.c-green::before  { background: linear-gradient(90deg, var(--green), #22c55e); }
-  .stat.c-red::before    { background: linear-gradient(90deg, var(--red), #f43f5e); }
-  .stat.c-cyan::before   { background: linear-gradient(90deg, var(--cyan), #38bdf8); }
-  .stat.c-pink::before   { background: linear-gradient(90deg, var(--pink), var(--violet)); }
+  .stat-icon.violet { background: var(--accent-soft); color: var(--accent); }
+  .stat-icon.green  { background: var(--success-soft); color: var(--success); }
+  .stat-icon.red    { background: var(--danger-soft); color: var(--danger); }
+  .stat-icon.cyan   { background: var(--info-soft); color: var(--info); }
 
   .stat-label {
-    color: var(--muted);
-    font-size: 11.5px;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
   .stat-value {
     font-family: var(--font-display);
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 23px;
+    font-weight: 800;
   }
 
-  /* ---------------- SECTION ---------------- */
+  /* =========================================================
+     SECTIONS / CARD LIST HEADER
+  ========================================================== */
 
-  .section { margin-bottom: 32px; }
+  .section { margin-bottom: 30px; }
+  .view { display: none; }
+  .view.active { display: block; }
 
-  .section-header {
+  .section-head {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
     margin-bottom: 14px;
   }
 
-  .section-header h2 {
+  .section-head h2 {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 16.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 15.5px;
+    font-weight: 800;
   }
 
-  .section-header h2::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 2px;
-    background: linear-gradient(135deg, var(--violet), var(--pink));
-    display: inline-block;
-    transform: rotate(45deg);
-  }
+  .section-head span { color: var(--text-faint); font-size: 12.5px; font-weight: 600; }
 
-  .section-header span { color: var(--muted); font-size: 12.5px; }
-
-  /* ---------------- DEVICES ---------------- */
+  /* =========================================================
+     DEVICES
+  ========================================================== */
 
   .devices {
     display: grid;
@@ -408,32 +480,13 @@
     gap: 14px;
   }
 
-  .device {
-    position: relative;
+  .device-card {
+    background: var(--surface);
     border: 1px solid var(--border);
-    background: var(--panel);
-    backdrop-filter: blur(14px);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     padding: 18px;
-    transition: border-color .2s ease, transform .2s ease;
+    box-shadow: var(--shadow-sm);
   }
-
-  .device:hover {
-    border-color: rgba(167,139,250,0.35);
-    transform: translateY(-2px);
-  }
-
-  .device::after {
-    content: "";
-    position: absolute;
-    left: 0; top: 16px; bottom: 16px;
-    width: 3px;
-    border-radius: 3px;
-    background: var(--muted-dim);
-  }
-
-  .device.is-online::after { background: linear-gradient(180deg, var(--green), transparent); }
-  .device.is-offline::after { background: linear-gradient(180deg, var(--red), transparent); }
 
   .device-top {
     display: flex;
@@ -442,138 +495,121 @@
     gap: 12px;
   }
 
-  .device-title { min-width: 0; }
-
   .device-name {
     font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 600;
-    word-break: break-word;
+    font-weight: 700;
+    font-size: 14.5px;
   }
 
   .device-manufacturer {
-    color: var(--muted);
-    margin-top: 4px;
-    font-size: 11.5px;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 3px;
   }
 
-  .online-badge {
+  .badge {
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     border-radius: 999px;
-    padding: 5px 10px;
+    padding: 4px 9px;
     font-size: 10.5px;
     font-weight: 700;
     letter-spacing: .3px;
   }
 
-  .online-badge.online {
-    color: var(--green);
-    background: rgba(74,222,128,.09);
-    border: 1px solid rgba(74,222,128,.25);
+  .badge.online  { color: var(--success); background: var(--success-soft); }
+  .badge.offline { color: var(--danger); background: var(--danger-soft); }
+  .badge.locked  { color: var(--text-faint); background: var(--surface-2); border: 1px solid var(--border); }
+
+  .device-phone {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  .online-badge.offline {
-    color: var(--red);
-    background: rgba(251,113,133,.09);
-    border: 1px solid rgba(251,113,133,.25);
-  }
-
-  .phone {
-    margin-top: 15px;
-    font-size: 14.5px;
-    font-weight: 600;
-    letter-spacing: .2px;
-  }
-
-  .phone.empty { color: var(--muted); font-weight: 400; }
+  .device-phone.empty { color: var(--text-faint); font-weight: 500; }
 
   .device-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 9px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 14px;
   }
 
-  .info {
-    background: rgba(255,255,255,0.025);
-    border: 1px solid var(--border-soft);
-    border-radius: 10px;
-    padding: 10px 11px;
+  .info-tile {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
   }
 
-  .info-label {
-    color: var(--muted-dim);
+  .info-tile .k {
     font-size: 9.5px;
     text-transform: uppercase;
     letter-spacing: .5px;
+    color: var(--text-faint);
+    font-weight: 700;
   }
 
-  .info-value { margin-top: 4px; font-size: 12.5px; word-break: break-word; }
+  .info-tile .v { margin-top: 3px; font-size: 12.5px; font-weight: 600; word-break: break-word; }
 
-  .battery { margin-top: 15px; }
+  .battery-row { margin-top: 14px; }
 
   .battery-head {
     display: flex;
     justify-content: space-between;
-    color: var(--muted);
+    color: var(--text-muted);
     font-size: 11.5px;
-    margin-bottom: 7px;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
   .battery-track {
     height: 6px;
     border-radius: 999px;
-    background: rgba(255,255,255,0.06);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     overflow: hidden;
   }
 
   .battery-fill {
     height: 100%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, var(--green), #86efac);
+    background: var(--success);
     width: 0%;
     transition: width .3s ease;
   }
 
-  .battery-fill.low { background: linear-gradient(90deg, var(--red), var(--amber)); }
+  .battery-fill.low { background: var(--danger); }
 
-  .device-footer {
+  .device-foot {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border-soft);
+    margin-top: 15px;
+    padding-top: 13px;
+    border-top: 1px solid var(--border);
   }
 
-  .last-seen { color: var(--muted-dim); font-size: 10.5px; line-height: 1.5; }
+  .last-seen { color: var(--text-faint); font-size: 10.5px; line-height: 1.5; }
 
-  /* device deletion disabled — locked badge replaces the old delete button */
-  .locked-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--muted-dim);
-    font-size: 10.5px;
-    border: 1px solid var(--border-soft);
-    border-radius: 999px;
-    padding: 5px 9px;
-  }
-
-  /* ---------------- SMS ---------------- */
+  /* =========================================================
+     MESSAGES
+  ========================================================== */
 
   .messages { display: flex; flex-direction: column; gap: 10px; }
 
   .message-card {
+    background: var(--surface);
     border: 1px solid var(--border);
-    background: var(--panel);
-    backdrop-filter: blur(14px);
-    border-radius: var(--radius);
-    padding: 16px 17px;
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
   }
 
   .message-top {
@@ -585,29 +621,18 @@
 
   .sender {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 14.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
   }
 
-  .sender::before {
-    content: "";
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--cyan), var(--violet));
-    flex-shrink: 0;
-  }
-
-  .message-time { color: var(--muted-dim); font-size: 10.5px; white-space: nowrap; }
+  .message-time { color: var(--text-faint); font-size: 11px; white-space: nowrap; font-weight: 500; }
 
   .message-body {
     margin-top: 10px;
     padding: 12px 13px;
-    border-radius: var(--radius-sm);
-    background: rgba(255,255,255,0.025);
-    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     line-height: 1.55;
@@ -620,101 +645,212 @@
     gap: 12px;
     align-items: center;
     margin-top: 11px;
-    color: var(--muted-dim);
-    font-size: 10.5px;
+    color: var(--text-faint);
+    font-size: 11px;
+    font-weight: 600;
   }
 
   .message-actions { display: flex; gap: 7px; }
 
   .small-btn {
     border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
     padding: 6px 10px;
     font-size: 11px;
-    transition: background .15s ease, color .15s ease;
+    font-weight: 700;
   }
 
-  .small-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
-  .small-btn.delete { color: var(--red); border-color: rgba(251,113,133,0.25); }
-  .small-btn.delete:hover { background: rgba(251,113,133,0.08); }
+  .small-btn:hover { background: var(--surface-2); color: var(--text); }
+  .small-btn.delete { color: var(--danger); border-color: var(--danger-soft); }
+  .small-btn.delete:hover { background: var(--danger-soft); }
 
-  /* ---------------- EMPTY ---------------- */
+  /* =========================================================
+     EMPTY / LOGIN / TOAST
+  ========================================================== */
 
   .empty {
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 40px 20px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 46px 20px;
     text-align: center;
-    color: var(--muted);
+    color: var(--text-muted);
     font-size: 13.5px;
+    background: var(--surface);
   }
 
-  /* ---------------- TOAST ---------------- */
+  .login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 30px 26px;
+    box-shadow: var(--shadow);
+  }
+
+  .login-mark {
+    width: 40px; height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .login-card h2 {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 19px;
+  }
+
+  .login-card p { color: var(--text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 22px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+
+  .field label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .field input {
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    border-radius: var(--radius-md);
+    color: var(--text);
+  }
+
+  .field input:focus { border-color: var(--accent); background: var(--surface); }
+
+  .login-error { margin-top: 12px; color: var(--danger); font-size: 12.5px; min-height: 16px; }
+
+  .theme-toggle-corner {
+    position: fixed;
+    top: 16px; right: 16px;
+  }
 
   .toast {
     position: fixed;
     right: 18px;
     bottom: 18px;
     max-width: 340px;
-    padding: 13px 16px;
-    border-radius: 13px;
-    background: #12162a;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    box-shadow: var(--shadow);
     font-size: 13px;
+    font-weight: 600;
     display: none;
     z-index: 1000;
-    backdrop-filter: blur(16px);
   }
 
-  .toast.show { display: block; animation: toast-in .25s ease; }
-  .toast.error { color: var(--red); border-color: rgba(251,113,133,0.3); }
-  .toast.success { color: var(--green); border-color: rgba(74,222,128,0.3); }
+  .toast.show { display: block; animation: toast-in .2s ease; }
+  .toast.error { color: var(--danger); border-color: var(--danger-soft); }
+  .toast.success { color: var(--success); border-color: var(--success-soft); }
 
   @keyframes toast-in {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ---------------- RESPONSIVE ---------------- */
+  /* =========================================================
+     MOBILE NAV
+  ========================================================== */
+
+  .mobile-topbar { display: none; }
+  .mobile-tabbar { display: none; }
+
+  /* =========================================================
+     RESPONSIVE
+  ========================================================== */
 
   @media (max-width: 1100px) {
     .devices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
-  @media (max-width: 700px) {
-    .app { padding: 18px 14px 50px; }
-    .header { align-items: flex-start; flex-direction: column; }
-    .api-status { align-self: stretch; justify-content: center; }
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+
+    .mobile-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .mobile-topbar .brand { padding: 0; }
+
+    .main { padding: 18px 16px 90px; }
+
+    .mobile-tabbar {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      gap: 4px;
+      z-index: 30;
+    }
+
+    .mobile-tabbar .nav-item {
+      flex: 1;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 10.5px;
+      text-align: center;
+      padding: 7px 4px;
+    }
+
+    .mobile-tabbar .nav-item .count { display: none; }
+
     .devices { grid-template-columns: 1fr; }
-    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .toolbar { align-items: stretch; flex-direction: column; }
-    .toolbar .search { min-width: 100%; }
-    .toolbar button, .toolbar select { width: 100%; justify-content: center; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar .search-wrap { min-width: 100%; }
+    .toolbar .select-input, .toolbar .btn { width: 100%; justify-content: center; }
     .message-top { flex-direction: column; gap: 6px; }
     .message-meta { align-items: flex-start; flex-direction: column; }
-    .login { margin: 6vh 14px; padding: 26px 20px; }
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: 480px) {
     .stats { grid-template-columns: 1fr 1fr; }
-    .stat-value { font-size: 20px; }
   }
 </style>
 </head>
 
 <body>
 
-<div class="sky" id="sky"><div class="shooting-star"></div></div>
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
 
-<div class="app">
+  <button class="switch theme-toggle-corner" id="loginThemeSwitch" onclick="toggleTheme()" aria-label="Toggle dark mode"></button>
 
-  <!-- LOGIN -->
-  <div id="login" class="login">
-    <div class="login-icon">🔐</div>
+  <div class="login-card">
+    <div class="login-mark">✦</div>
     <h2>SMS Dashboard</h2>
     <p>Enter your administrator token to view connected devices and incoming messages.</p>
 
@@ -723,83 +859,186 @@
       <input id="token" type="password" placeholder="Enter admin token" autocomplete="off">
     </div>
 
-    <button class="primary" onclick="login()">Open Dashboard</button>
+    <button class="btn primary" style="width:100%; justify-content:center; padding:12px;" onclick="login()">Open Dashboard</button>
     <div id="loginError" class="login-error"></div>
   </div>
+</div>
 
-  <!-- DASHBOARD -->
-  <div id="dashboard">
+<!-- APP SHELL -->
+<div id="appShell" class="shell" style="display:none">
 
-    <header class="header">
-      <div class="brand">
-        <div class="brand-mark">✦</div>
-        <div>
-          <h1>SMS Dashboard</h1>
-          <p>Device status and incoming messages</p>
-        </div>
+  <!-- SIDEBAR (desktop) -->
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="brand-name">SMS Dashboard</div>
+        <div class="brand-sub">Admin console</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Monitor</div>
+
+      <button class="nav-item active" data-view="overview" onclick="switchView('overview')">
+        <span class="ic">▦</span> Overview
+      </button>
+
+      <button class="nav-item" data-view="devices" onclick="switchView('devices')">
+        <span class="ic">▣</span> Devices
+        <span class="count" id="navDeviceCount">0</span>
+      </button>
+
+      <button class="nav-item" data-view="messages" onclick="switchView('messages')">
+        <span class="ic">✉</span> Messages
+        <span class="count" id="navMessageCount">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="theme-switch">
+        <span>Dark mode</span>
+        <button class="switch" id="themeSwitch" onclick="toggleTheme()" aria-label="Toggle dark mode"></button>
       </div>
 
-      <div class="api-status">
-        <span id="apiDot" class="dot"></span>
+      <button class="logout-link" onclick="logout()">↩ Logout</button>
+    </div>
+
+  </aside>
+
+  <!-- MOBILE TOPBAR -->
+  <div class="mobile-topbar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div class="brand-name">SMS Dashboard</div>
+    </div>
+
+    <button class="switch" id="themeSwitchMobile" onclick="toggleTheme()" aria-label="Toggle dark mode"></button>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="pageTitle">Overview</div>
+        <div class="page-sub" id="pageSub">Device status and incoming messages</div>
+      </div>
+
+      <div class="status-pill">
+        <span id="apiDot" class="live-dot"></span>
         <span id="apiText">Checking API...</span>
       </div>
-    </header>
+    </div>
 
-    <!-- TOOLBAR -->
     <div class="toolbar">
-      <input id="search" class="search ghost-btn" style="justify-content:flex-start" type="search" placeholder="Search device, phone, sender or message..." oninput="render()">
+      <div class="search-wrap">
+        <span class="ic">⌕</span>
+        <input id="search" class="search-input" type="search" placeholder="Search device, phone, sender or message..." oninput="render()">
+      </div>
 
-      <select id="deviceFilter" class="ghost-btn" onchange="render()">
+      <select id="deviceFilter" class="select-input" onchange="render()">
         <option value="all">All devices</option>
       </select>
 
-      <button class="ghost-btn" onclick="refreshAll()">↻ Refresh</button>
-      <button class="ghost-btn" onclick="logout()">Logout</button>
+      <button class="btn" onclick="refreshAll()">↻ Refresh</button>
     </div>
 
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat c-violet">
-        <div class="stat-label">Total Devices</div>
-        <div id="totalDevices" class="stat-value">0</div>
+    <!-- OVERVIEW VIEW -->
+    <div class="view active" id="view-overview">
+
+      <div class="stats">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Total Devices</div>
+            <div id="totalDevices" class="stat-value">0</div>
+          </div>
+          <div class="stat-icon violet">▣</div>
+        </div>
+
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Online</div>
+            <div id="onlineDevices" class="stat-value">0</div>
+          </div>
+          <div class="stat-icon green">●</div>
+        </div>
+
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Offline</div>
+            <div id="offlineDevices" class="stat-value">0</div>
+          </div>
+          <div class="stat-icon red">○</div>
+        </div>
+
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Messages</div>
+            <div id="totalMessages" class="stat-value">0</div>
+          </div>
+          <div class="stat-icon cyan">✉</div>
+        </div>
       </div>
-      <div class="stat c-green">
-        <div class="stat-label">Online</div>
-        <div id="onlineDevices" class="stat-value">0</div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Recent Devices</h2>
+          <span id="deviceCountOverview">0 devices</span>
+        </div>
+        <div id="devicesOverview" class="devices"></div>
       </div>
-      <div class="stat c-red">
-        <div class="stat-label">Offline</div>
-        <div id="offlineDevices" class="stat-value">0</div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Recent Messages</h2>
+          <span id="messageCountOverview">0 messages</span>
+        </div>
+        <div id="messagesOverview" class="messages"></div>
       </div>
-      <div class="stat c-cyan">
-        <div class="stat-label">Messages</div>
-        <div id="totalMessages" class="stat-value">0</div>
-      </div>
-      <div class="stat c-pink">
-        <div class="stat-label">Last Refresh</div>
-        <div id="lastRefresh" class="stat-value" style="font-size:14.5px">—</div>
+
+    </div>
+
+    <!-- DEVICES VIEW -->
+    <div class="view" id="view-devices">
+      <div class="section">
+        <div class="section-head">
+          <h2>All Devices</h2>
+          <span id="deviceCount">0 devices</span>
+        </div>
+        <div id="devices" class="devices"></div>
       </div>
     </div>
 
-    <!-- DEVICES -->
-    <section class="section">
-      <div class="section-header">
-        <h2>Devices</h2>
-        <span id="deviceCount">0 devices</span>
+    <!-- MESSAGES VIEW -->
+    <div class="view" id="view-messages">
+      <div class="section">
+        <div class="section-head">
+          <h2>All Messages</h2>
+          <span id="messageCount">0 messages</span>
+        </div>
+        <div id="messages" class="messages"></div>
       </div>
-      <div id="devices" class="devices"></div>
-    </section>
+    </div>
 
-    <!-- MESSAGES -->
-    <section class="section">
-      <div class="section-header">
-        <h2>Incoming SMS</h2>
-        <span id="messageCount">0 messages</span>
-      </div>
-      <div id="messages" class="messages"></div>
-    </section>
+  </main>
+</div>
 
-  </div>
+<!-- MOBILE BOTTOM TABS -->
+<div id="mobileTabbar" class="mobile-tabbar" style="display:none">
+  <button class="nav-item active" data-view="overview" onclick="switchView('overview')">
+    <span class="ic">▦</span> Overview
+  </button>
+  <button class="nav-item" data-view="devices" onclick="switchView('devices')">
+    <span class="ic">▣</span> Devices
+  </button>
+  <button class="nav-item" data-view="messages" onclick="switchView('messages')">
+    <span class="ic">✉</span> Messages
+  </button>
+  <button class="nav-item" onclick="logout()">
+    <span class="ic">↩</span> Logout
+  </button>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -811,27 +1050,52 @@ const API = "https://smssend-8ek4.onrender.com";
 let token = sessionStorage.getItem("admin_token") || "";
 let devices = [];
 let messages = [];
+let currentView = "overview";
+
+const PAGE_META = {
+  overview: { title: "Overview", sub: "Device status and incoming messages" },
+  devices:  { title: "Devices", sub: "All connected devices and their live status" },
+  messages: { title: "Messages", sub: "Incoming SMS captured from every device" }
+};
 
 /* -----------------------------
-   STARFIELD (purely decorative)
+   THEME
 ----------------------------- */
-(function buildSky() {
-  const sky = document.getElementById("sky");
-  const count = window.innerWidth < 700 ? 55 : 100;
 
-  for (let i = 0; i < count; i++) {
-    const star = document.createElement("div");
-    star.className = "star";
-    const size = Math.random() * 2 + 0.6;
-    star.style.width = `${size}px`;
-    star.style.height = `${size}px`;
-    star.style.top = `${Math.random() * 100}%`;
-    star.style.left = `${Math.random() * 100}%`;
-    star.style.animationDuration = `${2 + Math.random() * 4}s`;
-    star.style.animationDelay = `${Math.random() * 5}s`;
-    sky.appendChild(star);
-  }
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("sms_theme", theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme");
+  applyTheme(current === "dark" ? "light" : "dark");
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem("sms_theme");
+  applyTheme(saved === "dark" ? "dark" : "light");
 })();
+
+/* -----------------------------
+   VIEW SWITCHING
+----------------------------- */
+
+function switchView(view) {
+  currentView = view;
+
+  document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
+  document.getElementById(`view-${view}`).classList.add("active");
+
+  document.querySelectorAll(".nav-item[data-view]").forEach(el => {
+    el.classList.toggle("active", el.dataset.view === view);
+  });
+
+  document.getElementById("pageTitle").textContent = PAGE_META[view].title;
+  document.getElementById("pageSub").textContent = PAGE_META[view].sub;
+
+  render();
+}
 
 /* -----------------------------
    HELPERS
@@ -899,8 +1163,9 @@ async function login() {
     token = value;
     sessionStorage.setItem("admin_token", token);
 
-    document.getElementById("login").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("appShell").style.display = "flex";
+    document.getElementById("mobileTabbar").style.display = "";
     error.textContent = "";
 
     await refreshAll();
@@ -954,7 +1219,7 @@ async function api(endpoint, options = {}) {
 async function refreshAll() {
   if (!token) return;
 
-  setApiStatus("Checking...", false);
+  setApiStatus("Checking...", null);
 
   try {
     const results = await Promise.all([
@@ -970,7 +1235,6 @@ async function refreshAll() {
     render();
 
     setApiStatus("API Online", true);
-    document.getElementById("lastRefresh").textContent = new Date().toLocaleTimeString();
   } catch (err) {
     setApiStatus("API Offline", false);
     showToast(err.message, "error");
@@ -980,11 +1244,11 @@ async function refreshAll() {
 function setApiStatus(text, online) {
   document.getElementById("apiText").textContent = text;
   const dot = document.getElementById("apiDot");
-  dot.className = `dot ${online ? "online" : "offline"}`;
+  dot.className = `live-dot ${online === true ? "online" : online === false ? "offline" : ""}`;
 }
 
 /* -----------------------------
-   STATS
+   STATS + NAV COUNTS
 ----------------------------- */
 
 function updateStats() {
@@ -994,6 +1258,9 @@ function updateStats() {
   document.getElementById("onlineDevices").textContent = online;
   document.getElementById("offlineDevices").textContent = devices.length - online;
   document.getElementById("totalMessages").textContent = messages.length;
+
+  document.getElementById("navDeviceCount").textContent = devices.length;
+  document.getElementById("navMessageCount").textContent = messages.length;
 }
 
 /* -----------------------------
@@ -1034,10 +1301,9 @@ function render() {
 ----------------------------- */
 
 function renderDevices() {
-  const container = document.getElementById("devices");
   const search = document.getElementById("search").value.trim().toLowerCase();
 
-  const filtered = devices.filter(device => {
+  let filtered = devices.filter(device => {
     const haystack = [
       device.deviceId,
       device.phoneNumber,
@@ -1049,20 +1315,31 @@ function renderDevices() {
     return haystack.includes(search);
   });
 
-  document.getElementById("deviceCount").textContent =
-    `${filtered.length} device${filtered.length === 1 ? "" : "s"}`;
+  const isOverview = currentView === "overview";
+  const listForOverview = filtered.slice(0, 3);
 
-  if (!filtered.length) {
-    container.innerHTML = `<div class="empty">No devices found.</div>`;
-    return;
+  if (isOverview) {
+    document.getElementById("deviceCountOverview").textContent =
+      `${filtered.length} device${filtered.length === 1 ? "" : "s"}`;
+
+    const container = document.getElementById("devicesOverview");
+    container.innerHTML = listForOverview.length
+      ? listForOverview.map(deviceCard).join("")
+      : `<div class="empty">No devices found.</div>`;
+  } else {
+    document.getElementById("deviceCount").textContent =
+      `${filtered.length} device${filtered.length === 1 ? "" : "s"}`;
+
+    const container = document.getElementById("devices");
+    container.innerHTML = filtered.length
+      ? filtered.map(deviceCard).join("")
+      : `<div class="empty">No devices found.</div>`;
   }
-
-  container.innerHTML = filtered.map(device => deviceCard(device)).join("");
 }
 
 /* -----------------------------
    DEVICE CARD
-   (delete action removed — device deletion is disabled)
+   (device deletion is disabled — no delete action rendered)
 ----------------------------- */
 
 function deviceCard(device) {
@@ -1077,45 +1354,43 @@ function deviceCard(device) {
     : "Phone number not entered";
 
   return `
-    <article class="device is-${status}">
+    <article class="device-card">
 
       <div class="device-top">
-        <div class="device-title">
+        <div>
           <div class="device-name">${escapeHtml(device.model || "Unknown device")}</div>
           <div class="device-manufacturer">${escapeHtml(device.manufacturer || "Unknown manufacturer")}</div>
         </div>
 
-        <div class="online-badge ${status}">
-          ${device.isOnline ? "ONLINE" : "OFFLINE"}
-        </div>
+        <span class="badge ${status}">${device.isOnline ? "ONLINE" : "OFFLINE"}</span>
       </div>
 
-      <div class="phone ${device.phoneNumber ? "" : "empty"}">☎ ${phone}</div>
+      <div class="device-phone ${device.phoneNumber ? "" : "empty"}">☎ ${phone}</div>
 
       <div class="device-info">
-        <div class="info">
-          <div class="info-label">Android</div>
-          <div class="info-value">${escapeHtml(device.androidVersion || "Unknown")}</div>
+        <div class="info-tile">
+          <div class="k">Android</div>
+          <div class="v">${escapeHtml(device.androidVersion || "Unknown")}</div>
         </div>
 
-        <div class="info">
-          <div class="info-label">App Version</div>
-          <div class="info-value">${escapeHtml(device.appVersion || "Unknown")}</div>
+        <div class="info-tile">
+          <div class="k">App Version</div>
+          <div class="v">${escapeHtml(device.appVersion || "Unknown")}</div>
         </div>
 
-        <div class="info">
-          <div class="info-label">SMS Count</div>
-          <div class="info-value">${Number(device.smsCount || 0)}</div>
+        <div class="info-tile">
+          <div class="k">SMS Count</div>
+          <div class="v">${Number(device.smsCount || 0)}</div>
         </div>
 
-        <div class="info">
-          <div class="info-label">Charging</div>
-          <div class="info-value">${device.isCharging ? "⚡ Yes" : "No"}</div>
+        <div class="info-tile">
+          <div class="k">Charging</div>
+          <div class="v">${device.isCharging ? "⚡ Yes" : "No"}</div>
         </div>
       </div>
 
       ${battery !== null ? `
-        <div class="battery">
+        <div class="battery-row">
           <div class="battery-head">
             <span>Battery</span>
             <span>${battery}%</span>
@@ -1126,13 +1401,13 @@ function deviceCard(device) {
         </div>
       ` : ""}
 
-      <div class="device-footer">
+      <div class="device-foot">
         <div class="last-seen">
           Last seen: ${timeAgo(device.lastSeen)}<br>
           ${formatDate(device.lastSeen)}
         </div>
 
-        <span class="locked-tag" title="Device deletion is disabled">🔒 Protected</span>
+        <span class="badge locked" title="Device deletion is disabled">🔒 Protected</span>
       </div>
 
     </article>
@@ -1144,11 +1419,10 @@ function deviceCard(device) {
 ----------------------------- */
 
 function renderMessages() {
-  const container = document.getElementById("messages");
   const search = document.getElementById("search").value.trim().toLowerCase();
   const selectedDevice = document.getElementById("deviceFilter").value;
 
-  const filtered = messages.filter(message => {
+  let filtered = messages.filter(message => {
     if (selectedDevice !== "all" && message.deviceId !== selectedDevice) return false;
 
     const haystack = [message.sender, message.message, message.deviceId]
@@ -1157,15 +1431,26 @@ function renderMessages() {
     return haystack.includes(search);
   });
 
-  document.getElementById("messageCount").textContent =
-    `${filtered.length} message${filtered.length === 1 ? "" : "s"}`;
+  const isOverview = currentView === "overview";
 
-  if (!filtered.length) {
-    container.innerHTML = `<div class="empty">No messages found.</div>`;
-    return;
+  if (isOverview) {
+    document.getElementById("messageCountOverview").textContent =
+      `${filtered.length} message${filtered.length === 1 ? "" : "s"}`;
+
+    const overviewList = filtered.slice(0, 4);
+    const container = document.getElementById("messagesOverview");
+    container.innerHTML = overviewList.length
+      ? overviewList.map(messageCard).join("")
+      : `<div class="empty">No messages found.</div>`;
+  } else {
+    document.getElementById("messageCount").textContent =
+      `${filtered.length} message${filtered.length === 1 ? "" : "s"}`;
+
+    const container = document.getElementById("messages");
+    container.innerHTML = filtered.length
+      ? filtered.map(messageCard).join("")
+      : `<div class="empty">No messages found.</div>`;
   }
-
-  container.innerHTML = filtered.map(message => messageCard(message)).join("");
 }
 
 /* -----------------------------
@@ -1233,7 +1518,7 @@ async function deleteMessage(id) {
 ----------------------------- */
 
 setInterval(() => {
-  if (token && document.getElementById("dashboard").style.display !== "none") {
+  if (token && document.getElementById("appShell").style.display !== "none") {
     refreshAll();
   }
 }, 30000);
@@ -1243,8 +1528,9 @@ setInterval(() => {
 ----------------------------- */
 
 if (token) {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("appShell").style.display = "flex";
+  document.getElementById("mobileTabbar").style.display = "";
   refreshAll();
 }
 
